@@ -15,7 +15,7 @@ bower install angular-datatable
     <data-table>
         <data-table-column head="Test" name="test"></data-table-column>
         <data-table-column head="Test2" render="renderTest2"></data-table-column>
-        <data-table-column head="Test3" render="test3"></data-table-column>
+        <data-table-column head="Test3" name="test3"></data-table-column>
         <data-table-column head="Test4">
             {{rowData.test4}}
         </data-table-column>
@@ -25,11 +25,11 @@ bower install angular-datatable
 <script type="text/javascript">
     function DemoCtrl($scope){
 
-        $scope.renderTest = function(rowData){
+        $scope.renderTest2 = function(rowData){
             return $('this is a demo' + rowData.name);
         }
 
-        $scope.renderTest2 = function(rowData){
+        $scope.renderTest3 = function(rowData){
             return rowData.test;
         }
     }
