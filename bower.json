@@ -1,0 +1,20 @@
+{
+    "name": "angular-datatable",
+    "version": "0.0.1",
+    "homepage": "https://github.com/binlaniua/angular-datatable",
+    "authors": [
+        "binlaniua <binlaniua@gmail.com>"
+    ],
+    "main": "dist/datatable.min.js",
+    "keywords": [
+        "datatable"
+    ],
+    "license": "MIT",
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "test",
+        "tests"
+    ]
+}
