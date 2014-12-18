@@ -14,8 +14,8 @@ module.exports = function (grunt) {
             build: {
                 files: {
                     'dist/datatable.min.js': [
-                        'src/**/*.js',
-                        'src/application.js'
+                        'src/application.js',
+                        'src/**/*.js'
                     ]
                 }
             }
