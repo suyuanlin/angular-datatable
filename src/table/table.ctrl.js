@@ -213,5 +213,19 @@
 
             //
             $scope.$table = $table;
+            $scope.$on('dataTable.beforeLoadData', function(evt, aoData){
+            });
+            $scope.$on('dataTable.beforeHandlerData', function(evt, responseData){
+                $scope.$table.beforeDataHandler(responseData);
+            });
+            $scope.$on('dataTable.afterHandlerData', function(evt, responseData){
+                $scope.$table.afterDataHandler(responseData);
+            });
+            $scope.$on('dataTable.failLoadData', function(evt, responseData){
+                $scope.$table.errorHandleData(responseData);
+            });
+            $scope.$on('dataTable.afterLoadData', function(evt){
+            });
+
         });
 })();
