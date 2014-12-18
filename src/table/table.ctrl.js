@@ -188,7 +188,7 @@
                         }
                     });
                     this.checkAllState();
-                    $scope.$emit('uitable.doSelectAll', isCheck, $table.selectValues);
+                    $scope.$emit('dataTable.doSelectAll', isCheck, $table.selectValues);
                 },
 
                 /**
@@ -206,7 +206,7 @@
                         this.selectValues.remove(target.value);
                     }
                     this.checkAllState();
-                    $scope.$emit('uitable.doSelectOne', isCheck, $table.selectValues);
+                    $scope.$emit('dataTable .doSelectOne', isCheck, $table.selectValues);
                 }
 
             };
