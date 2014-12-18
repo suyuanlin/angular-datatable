@@ -54,10 +54,10 @@
              * export
              * @returns {{create: create}}
              */
-            this.$get = function (dataTableService) {
+            this.$get = function () {
                 return {
                     create: function (scope, element, attrs, columns) {
-                        return new Builder(scope, element, attrs, columns).create(dataTableService);
+                        return new Builder(scope, element, attrs, columns).create();
                     }
                 }
             }
@@ -110,8 +110,8 @@
         /**
          *
          */
-        create: function (dataTableService) {
-            return new dataTableService(this.scope, this.element, this.attrs, this.columns, this.config);
+        create: function () {
+            return this.instance = $(this.element.find('table')).dataTable(this.config);
         }
     });
 
