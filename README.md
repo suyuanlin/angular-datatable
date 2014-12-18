@@ -12,14 +12,14 @@ bower install angular-datatable
 <script type="text/javascript" src="bower_components/angular-datatable/datatable.js"></script>
 
 <div ng-controller="DemoCtrl">
-    <dataTable>
+    <data-table>
         <data-table-column head="Test" name="test"></data-table-column>
         <data-table-column head="Test2" render="renderTest2"></data-table-column>
         <data-table-column head="Test3" render="test3"></data-table-column>
         <data-table-column head="Test4">
             {{rowData.test4}}
         </data-table-column>
-    </dataTable>
+    </data-table>
 </div>
 
 <script type="text/javascript">
