@@ -153,7 +153,7 @@
                 function(responseData){
                     scope.$emit('dataTable.failLoadData', responseData);
                 })
-            .finally(
+            .always(
 
                 //whatever call this function
                 function () {

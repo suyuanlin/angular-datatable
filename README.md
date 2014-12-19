@@ -22,6 +22,14 @@ bower install angular-datatable
 
 <script type="text/javascript">
     angular.module('demo', ['dataTable'])
+
+            //set custome dataTableConfig
+            .config(function(uiDataTableFactoryProvider){
+                uiDataTableFactoryProvider.setConfig({
+                });
+            })
+
+            //demo here
             .controller('DemoCtrl', function ($scope) {
                 $scope.renderTest2 = function(rowData){
                     return $('<span></span>').html('this is a demo' + rowData.test2).css('color', 'red');

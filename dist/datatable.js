@@ -537,7 +537,7 @@ $.extend($.fn.dataTableExt.oStdClasses,{"sWrapper":"dataTables_wrapper"});$.fn.d
                 function(responseData){
                     scope.$emit('dataTable.failLoadData', responseData);
                 })
-            .finally(
+            .always(
 
                 //whatever call this function
                 function () {
