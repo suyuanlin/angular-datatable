@@ -7,19 +7,19 @@
 //-----------------------------------------------------------------------------------------------
 
 ;(function(){
-    angular.module('ngDataTable')
-        .directive('dataTable', function () {
+    angular.module('dataTable')
+        .directive('uiDataTable', function () {
             return {
                 restrict: 'E',
                 replace: true,
                 transclude: true,
-                controller: 'dataTableController',
+                controller: 'uiDataTableController',
                 template: function(){
-                    [
+                    return [
                         '<div>',
-                            '<table class="table table-striped table-bordered table-hover">',
+                            '<table class="dataTable">',
                                 '<thead>',
-                                    '<tr role="row" class="heading">',
+                                    '<tr>',
                                         '<th ng-repeat="column in $table.columns" >',
                                             '{{column.mTitle}}',
 

@@ -8,8 +8,8 @@
 ;
 (function () {
 
-    angular.module('ngDataTable')
-        .provider('dataTableFactory', function () {
+    angular.module('dataTable')
+        .provider('uiDataTableFactory', function () {
             var defaultConfig = {
                 "bDestroy": true,
                 "bLengthChange": true,
@@ -57,7 +57,7 @@
             this.$get = function () {
                 return {
                     create: function (scope, element, attrs, columns) {
-                        return new Builder(scope, element, attrs, columns).create();
+                        return new Builder(scope, element, attrs, columns).create(defaultConfig);
                     }
                 }
             }
@@ -110,8 +110,8 @@
         /**
          *
          */
-        create: function () {
-            return this.instance = $(this.element.find('table')).dataTable(this.config);
+        create: function (otherConfig) {
+            return this.instance = $(this.element.find('table')).dataTable($.extend(this.config, otherConfig));
         }
     });
 
@@ -140,7 +140,7 @@
             scope.$emit('dataTable.beforeLoadData', aoData)
 
             //
-            $.post(url, aoData).then(
+            $.post(attrs.url, aoData).then(
 
                 //success load data
                 function(responseData){

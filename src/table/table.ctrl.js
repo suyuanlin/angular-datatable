@@ -12,8 +12,8 @@
     /**
      * export
      */
-    angular.module('ngDataTablet')
-        .controller('dataTableController', function ($scope, $element, $attrs, dataTableFactory) {
+    angular.module('dataTable')
+        .controller('uiDataTableController', function ($scope, $element, $attrs, uiDataTableFactory) {
 
             //删除qm-column数据, 无用数据
             $element.find('>div').remove();
@@ -48,7 +48,7 @@
                     if (this.checkMode) {
                         this.elAllCheck = $element.find('th :checkbox')[0];
                     }
-                    $table.instance = dataTableFactory.create($scope, $element, $attrs, $table.columns);
+                    $table.instance = uiDataTableFactory.create($scope, $element, $attrs, $table.columns);
                 },
 
                 /**

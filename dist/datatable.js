@@ -1,3 +1,5 @@
+/*! angular.datatable - v0.0.1 - 2014-12-19 */
+;(function(){
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -18,3 +20,531 @@ $.extend($.fn.dataTableExt.oStdClasses,{"sWrapper":"dataTables_wrapper"});$.fn.d
 //
 //-----------------------------------------------------------------------------------------------
 ;angular.module('dataTable', []);
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+;
+(function () {
+    angular.module('dataTable')
+        .controller('uiDataTableColumnController', function ($scope, $element, $attrs) {
+
+            //find custom render
+            var name = $attrs.name || '',
+                renderFnName = 'render' + name.split('')[0].toUpperCase() + name.substr(1),
+                render = $scope[$attrs.render] || $scope[renderFnName];
+
+            //special render
+            if ($attrs.render == 'checked') {
+                $scope.$table.userCheckMode($attrs.name);
+            }
+
+            var columnConfig = {
+
+                //
+                sName: $attrs.name || '',
+                mTitle: $attrs.head,
+                mTip: $attrs.tooltip,
+                mIndex: $scope.$table.columns.length,
+                bChecked: $attrs.render == 'checked',
+
+                //
+                sClass: $attrs.css || '',
+                sWidth: $attrs.width || 'smart',
+                bVisible: $attrs.novisible === undefined,
+                bSortable: $attrs.sort !== undefined,
+                mDataProp: function (aData, type) {
+
+                    //
+                    if (type != 'display') {
+                        return '';
+                    }
+                    //
+                    if (arguments.length == 3) {
+                        return arguments[2];
+                    }
+                    else {
+                        var r = render ? render.apply(this, arguments) : aData[name];
+                        r = r != undefined ? r : '';
+                        if (r != undefined && angular.isString(r)) {
+                            r = $.trim(r);
+                            r = r.length ? r : ''
+                            r = '<div>' + r + '</div>';
+                        }
+                        return r;
+                    }
+                }
+            };
+
+            //
+            $scope.$table.columns.push(columnConfig);
+        }
+    );
+})();
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+;
+(function () {
+    angular.module('dataTable')
+        .directive('uiDataTableColumn', function () {
+            return {
+                restrict: 'E',
+                transclude: true,
+                template: '',
+                replace: true,
+                controller: 'uiDataTableColumnController'
+            };
+        });
+})();
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  dataTable ctrl
+//
+//
+//-----------------------------------------------------------------------------------------------
+
+;
+(function () {
+
+    /**
+     * export
+     */
+    angular.module('dataTable')
+        .controller('uiDataTableController', function ($scope, $element, $attrs, uiDataTableFactory) {
+
+            //删除qm-column数据, 无用数据
+            $element.find('>div').remove();
+
+            //
+            var $table = {
+
+                $el: $element,
+
+                //
+                columns: [],
+
+                //
+                nopageMode: $attrs.nopage !== undefined,
+
+                //
+                pageResult: undefined, //data
+
+                //
+                idName: undefined,  //
+                elAllCheck: undefined, //all check dom
+                checkMode: false, //check mode, default off
+                elChecks: [], //all checks dom
+                checkNum: 0, //check number
+                selectValues: [], //check item values
+                selectItems: [], //check item objects
+
+
+                //
+                instance: undefined,
+                initTable: function () {
+                    if (this.checkMode) {
+                        this.elAllCheck = $element.find('th :checkbox')[0];
+                    }
+                    $table.instance = uiDataTableFactory.create($scope, $element, $attrs, $table.columns);
+                },
+
+                /**
+                 *
+                 * @param rowIndex
+                 * @returns {*}
+                 */
+                getRowDataAtIndex: function (rowIndex) {
+                    return this.pageResult.aaData[rowIndex];
+                },
+
+                /**
+                 * all setting
+                 * @param columnIndex
+                 */
+                getSetting: function () {
+                    var settings = $scope.$table.instance.fnSettings();
+                    return settings;
+                },
+
+                /**
+                 * row setting
+                 * @param columnIndex
+                 */
+                getColumnSetting: function (columnIndex) {
+                    var settings = this.getSetting();
+                    return settings.aoColumns[columnIndex];
+                },
+
+                /**
+                 *
+                 */
+                beforeDataHandler: function (responseData) {
+                    this.checkNum = 0;
+                    this.elChecks = [];
+                    this.pageResult = responseData;
+
+                    if (this.checkMode) {
+                        this.elAllCheck.checked = false;
+                    }
+
+                    //
+                    if (this.nopageMode) {
+                        this.selectValues = [];
+                        this.selectItems = [];
+                    }
+                },
+
+                /**
+                 *
+                 */
+                afterDataHandler: function (responseData) {
+                    if (this.checkMode) {
+                        this.checkAllState();
+                    }
+                },
+
+                /**
+                 *  error load data
+                 */
+                errorHandleData: function (json) {
+                },
+
+                /**
+                 * setup check mode
+                 */
+                userCheckMode: function (idName) {
+                    if (!this.checkMode) {
+                        this.checkMode = true;
+                        this.idName = idName || 'id';
+                    }
+                },
+
+                /**
+                 * check all
+                 */
+                checkAllState: function () {
+                    var notDisabledCheckboxNum = 0;
+                    $.each(this.elChecks, function (i, cb) {
+                        if (!cb.disabled) {
+                            notDisabledCheckboxNum++;
+                        }
+                    });
+                    this.elAllCheck.checked = this.checkNum == notDisabledCheckboxNum && this.checkNum != 0;
+                },
+
+                /**
+                 * add request param to load data
+                 * @param params
+                 * @param url
+                 */
+                doSearch: function (params, url) {
+                    $scope.$emit('dataTable.beforeDoSearch');
+                    $attrs.searchParams = params || [];
+                    $attrs.url = url || $attrs.url;
+                    $table.instance.fnPageChange("first");
+                },
+
+                /**
+                 * jump to page
+                 * @param index
+                 */
+                jumpTo: function (index) {
+                    if (/^\d+$/.test(index)) {
+                        index = parseInt(index) - 1;
+                    }
+                    else if (index == undefined) {
+                        index = this.getCurrentPage() - 1;
+                    }
+                    $table.instance.fnPageChange(index != undefined ? Math.abs(index) : "first");
+                },
+
+                /**
+                 *
+                 * @returns {number}
+                 */
+                getCurrentPage: function () {
+                    var setting = this.getSetting();
+                    return setting._iDisplayStart / setting._iDisplayLength + 1;
+                },
+
+                /**
+                 * click all check dom
+                 */
+                selectAll: function (focusSelect) {
+                    var isCheck = focusSelect != undefined ? focusSelect : this.elAllCheck.checked;
+                    $table.checkNum = 0;
+                    $(this.elChecks).each(function (i, item) {
+                        item.checked = isCheck;	//set status
+                        if (isCheck) {
+                            $table.checkNum++;
+                            $table.selectValues.upush(item.value);
+                        }
+                        else {
+                            $table.checkNum--;
+                            $table.selectValues.remove(item.value);
+                        }
+                    });
+                    this.checkAllState();
+                    $scope.$emit('dataTable.doSelectAll', isCheck, $table.selectValues);
+                },
+
+                /**
+                 * click one check dom
+                 * @param target
+                 */
+                selectOne: function (target) {
+                    var isCheck = target.checked;
+                    if (isCheck) {
+                        this.checkNum++;
+                        this.selectValues.upush(target.value);
+                    }
+                    else {
+                        this.checkNum--;
+                        this.selectValues.remove(target.value);
+                    }
+                    this.checkAllState();
+                    $scope.$emit('dataTable .doSelectOne', isCheck, $table.selectValues);
+                }
+
+            };
+
+            //
+            $scope.$table = $table;
+            $scope.$on('dataTable.beforeLoadData', function(evt, aoData){
+            });
+            $scope.$on('dataTable.beforeHandlerData', function(evt, responseData){
+                $scope.$table.beforeDataHandler(responseData);
+            });
+            $scope.$on('dataTable.afterHandlerData', function(evt, responseData){
+                $scope.$table.afterDataHandler(responseData);
+            });
+            $scope.$on('dataTable.failLoadData', function(evt, responseData){
+                $scope.$table.errorHandleData(responseData);
+            });
+            $scope.$on('dataTable.afterLoadData', function(evt){
+            });
+
+        });
+})();
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  dataTable directive
+//
+//
+//-----------------------------------------------------------------------------------------------
+
+;(function(){
+    angular.module('dataTable')
+        .directive('uiDataTable', function () {
+            return {
+                restrict: 'E',
+                replace: true,
+                transclude: true,
+                controller: 'uiDataTableController',
+                template: function(){
+                    return [
+                        '<div>',
+                            '<table class="dataTable">',
+                                '<thead>',
+                                    '<tr>',
+                                        '<th ng-repeat="column in $table.columns" >',
+                                            '{{column.mTitle}}',
+
+                                            //data column is check
+                                            '<input ng-if="column.bChecked" type="checkbox" ng-click="$table.selectAll()"/>',
+
+                                            //data column need tooltip
+                                            '<a ng-if="column.mTip" title="{{column.mTip}}" href="javascript:void(0);"><i class="icon icon-question-sign"></i></a>',
+
+                                            //only to notice all column has create, tell us to create data table now
+                                            '<span ng-if="$last" ng-init="$table.initTable()" style="display:none"></span>',
+                                        '</th>',
+                                    '</tr>',
+                                '</thead>',
+                                '<tbody></tbody>',
+                            '</table>',
+                            '<div ng-transclude></div>',
+                        '</div>'
+                    ].join('')
+                }
+            };
+        });
+})();
+
+
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  dataTable provider
+//      provider custom datatable style config
+//
+//-----------------------------------------------------------------------------------------------
+;
+(function () {
+
+    angular.module('dataTable')
+        .provider('uiDataTableFactory', function () {
+            var defaultConfig = {
+                "bDestroy": true,
+                "bLengthChange": true,
+                "bFilter": false,
+                "bSort": true,
+                "bAutoWidth": false,
+                "bStateSave": true,
+                "fnStateLoadParams": function (oSettings, oData) {
+                },
+                "oLanguage": {
+                    "sProcessing": '<img src="/static/img/loading-spinner-grey.gif"/><span>&nbsp;&nbsp;正在查询...</span>',
+                    "sLengthMenu": "每页显示 _MENU_ 条",
+                    "sZeroRecords": "请选择条件后，点击搜索按钮开始搜索",
+                    "sInfo": "<label>当前第 _START_ - _END_ 条　共计 _TOTAL_ 条</label>",
+                    "sInfoEmpty": "没有符合条件的记录",
+                    "sInfoFiltered": "(从 _MAX_ 条记录中过滤)",
+                    "sSearch": "查询",
+                    "oPaginate": {
+                        "sFirst": "首页",
+                        "sPrevious": "上一页",
+                        "sNext": "下一页",
+                        "sLast": "尾页"
+                    }
+                },
+                "aLengthMenu": [
+                    [10, 20, 30],
+                    [10, 20, 30]
+                ],
+                "bProcessing": true,
+                "bServerSide": true
+            };
+
+            /**
+             * set custom config
+             * @param config
+             */
+            this.setConfig = function (config) {
+                $.extend(defaultConfig, config || {});
+            };
+
+            /**
+             * export
+             * @returns {{create: create}}
+             */
+            this.$get = function () {
+                return {
+                    create: function (scope, element, attrs, columns) {
+                        return new Builder(scope, element, attrs, columns).create(defaultConfig);
+                    }
+                }
+            }
+        });
+
+
+    /**
+     *
+     * @param scope
+     * @param element
+     * @param attrs
+     * @param columns
+     * @constructor
+     */
+    var Builder = function (scope, element, attrs, columns) {
+        this.scope = scope;
+        this.element = element;
+        this.attrs = attrs;
+        this.columns = columns;
+        this.dataProvider = new DataProvider(this);
+
+        this.initConfig();
+    };
+
+    $.extend(Builder.prototype, {
+
+        /**
+         *
+         * @param scope
+         * @param element
+         * @param attrs
+         * @param columns
+         */
+        initConfig: function () {
+            this.config = {
+                "aoColumns": this.columns,
+                "aaSorting": JSON.parse(this.attrs.sort || '[]'),
+                "fnInitComplete": function () {
+                },
+                "fnServerData": $.proxy(this.dataProvider.loadData, this.dataProvider)
+            };
+
+            //check is nopage mode?
+            if (this.attrs.nopage) {
+                this.config.bPaginate = false;
+                this.config.bInfo = false;
+            }
+        },
+
+        /**
+         *
+         */
+        create: function (otherConfig) {
+            return this.instance = $(this.element.find('table')).dataTable($.extend(this.config, otherConfig));
+        }
+    });
+
+
+    /**
+     *
+     * @param builder
+     * @constructor
+     */
+    var DataProvider = function (builder) {
+        this.builder = builder;
+    };
+    $.extend(DataProvider.prototype, {
+        loadData: function (sSource, aoData, fnCallback) {
+            var scope = this.builder.scope,
+                attrs = this.builder.attrs;
+
+            //not set url or set manual mode
+            if (!attrs.url || attrs.manual != undefined) {
+                delete attrs.manual;
+                fnCallback({aaData: [], iTotalRecords: 0, iTotalDisplayRecords: 0});
+                return;
+            }
+
+            //before loadData you can add other request param in aoData
+            scope.$emit('dataTable.beforeLoadData', aoData)
+
+            //
+            $.post(attrs.url, aoData).then(
+
+                //success load data
+                function(responseData){
+                    scope.$emit('dataTable.beforeHandlerData', responseData);
+                    fnCallback(responseData);
+                    scope.$emit('dataTable.afterHandlerData', responseData);
+                },
+
+                //fail load data
+                function(responseData){
+                    scope.$emit('dataTable.failLoadData', responseData);
+                })
+            .finally(
+
+                //whatever call this function
+                function () {
+                    scope.$emit('dataTable.afterLoadData');
+                });
+        }
+    })
+})
+();
+})();

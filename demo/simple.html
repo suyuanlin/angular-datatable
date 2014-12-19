@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html ng-app="demo">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Simple Demo</title>
+    <link rel="stylesheet" href="../dist/datatable.css">
+</head>
+<body>
+
+<div ng-controller="DemoCtrl">
+    <ui-data-table url="/user/list">
+        <ui-data-table-column head="I'm Title1" name="test"></ui-data-table-column>
+        <ui-data-table-column head="I'm Title2" name="test2"></ui-data-table-column>
+        <ui-data-table-column head="I'm Title3" name="test3"></ui-data-table-column>
+        <ui-data-table-column head="I'm Title4" name="test4"></ui-data-table-column>
+    </ui-data-table>
+</div>
+
+</body>
+
+<script type="text/javascript" src="../bower_components/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript" src="../bower_components/angular/angular.min.js"></script>
+<script type="text/javascript" src="../bower_components/jquery-mockjax/jquery.mockjax.js"></script>
+<script type="text/javascript" src="../dist/datatable.js"></script>
+
+<script type="text/javascript">
+    $.mockjax({
+        url: "/user/list",
+        response: function () {
+            var aaData = [];
+            for(var i = 0; i < 10; i++){
+                aaData.push({
+                    test: Math.random(),
+                    test2: Math.random(),
+                    test3: Math.random(),
+                    test4: Math.random()
+                })
+            }
+            this.responseText = {
+                aaData: aaData,
+                iTotalDisplayRecords: 10,
+                iTotalRecords: 100
+            };
+        }
+    });
+</script>
+
+<script type="text/javascript">
+    angular.module('demo', ['dataTable'])
+            .controller('DemoCtrl', function ($scope) {
+                console.info(1);
+            });
+</script>
+</html>

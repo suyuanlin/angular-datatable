@@ -7,8 +7,8 @@
 //------------------------------------------------------
 ;
 (function () {
-    angular.module('ngDataTable')
-        .controller('dataTableColumnController', function ($scope, $element, $attrs) {
+    angular.module('dataTable')
+        .controller('uiDataTableColumnController', function ($scope, $element, $attrs) {
 
             //find custom render
             var name = $attrs.name || '',

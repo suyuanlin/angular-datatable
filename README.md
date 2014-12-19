@@ -12,14 +12,12 @@ bower install angular-datatable
 <script type="text/javascript" src="bower_components/angular-datatable/datatable.js"></script>
 
 <div ng-controller="DemoCtrl">
-    <data-table>
-        <data-table-column head="Test" name="test"></data-table-column>
-        <data-table-column head="Test2" render="renderTest2"></data-table-column>
-        <data-table-column head="Test3" name="test3"></data-table-column>
-        <data-table-column head="Test4">
-            {{rowData.test4}}
-        </data-table-column>
-    </data-table>
+    <ui-data-table url="/user/list">
+        <ui-data-table-column head="I'm Title1" name="test"></ui-data-table-column>
+        <ui-data-table-column head="I'm Title2" name="test2"></ui-data-table-column>
+        <ui-data-table-column head="I'm Title3" name="test3"></ui-data-table-column>
+        <ui-data-table-column head="I'm Title4" name="test4"></ui-data-table-column>
+    </ui-data-table>
 </div>
 
 <script type="text/javascript">

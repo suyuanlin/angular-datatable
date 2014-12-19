@@ -7,14 +7,14 @@
 //------------------------------------------------------
 ;
 (function () {
-    angular.module('ngDataTable')
-        .directive('dataTableColumn', function () {
+    angular.module('dataTable')
+        .directive('uiDataTableColumn', function () {
             return {
                 restrict: 'E',
                 transclude: true,
                 template: '',
                 replace: true,
-                controller: 'dataTableColumnController'
+                controller: 'uiDataTableColumnController'
             };
         });
 })();
