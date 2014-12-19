@@ -34,8 +34,8 @@ $.extend($.fn.dataTableExt.oStdClasses,{"sWrapper":"dataTables_wrapper"});$.fn.d
 
             //find custom render
             var name = $attrs.name || '',
-                renderFnName = 'render' + name.split('')[0].toUpperCase() + name.substr(1),
-                render = $scope[$attrs.render] || $scope[renderFnName];
+                renderFnName = $attrs.render || 'render' + name.split('')[0].toUpperCase() + name.substr(1),
+                render = $scope[renderFnName];
 
             //special render
             if ($attrs.render == 'checked') {

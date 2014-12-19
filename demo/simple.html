@@ -11,7 +11,7 @@
     <ui-data-table url="/user/list">
         <ui-data-table-column head="I'm Title1" name="test"></ui-data-table-column>
         <ui-data-table-column head="I'm Title2" name="test2"></ui-data-table-column>
-        <ui-data-table-column head="I'm Title3" name="test3"></ui-data-table-column>
+        <ui-data-table-column head="I'm Title3" render="renderTest3"></ui-data-table-column>
         <ui-data-table-column head="I'm Title4" name="test4"></ui-data-table-column>
     </ui-data-table>
 </div>
@@ -48,7 +48,13 @@
 <script type="text/javascript">
     angular.module('demo', ['dataTable'])
             .controller('DemoCtrl', function ($scope) {
-                console.info(1);
+                $scope.renderTest2 = function(rowData){
+                    return $('<span></span>').html('this is a demo' + rowData.test2).css('color', 'red');
+                }
+
+                $scope.renderTest3 = function(rowData){
+                    return rowData.test;
+                }
             });
 </script>
 </html>
