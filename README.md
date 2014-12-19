@@ -21,16 +21,16 @@ bower install angular-datatable
 </div>
 
 <script type="text/javascript">
-    function DemoCtrl($scope){
+    angular.module('demo', ['dataTable'])
+            .controller('DemoCtrl', function ($scope) {
+                $scope.renderTest2 = function(rowData){
+                    return $('<span></span>').html('this is a demo' + rowData.test2).css('color', 'red');
+                }
 
-        $scope.renderTest2 = function(rowData){
-            return $('this is a demo' + rowData.name);
-        }
-
-        $scope.renderTest3 = function(rowData){
-            return rowData.test;
-        }
-    }
+                $scope.renderTest3 = function(rowData){
+                    return rowData.test;
+                }
+            });
 </script>
 ```
 
